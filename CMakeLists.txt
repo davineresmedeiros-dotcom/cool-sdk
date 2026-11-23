@@ -42,6 +42,7 @@ if(ANDROID)
     # include/link interface, but stop exporting C compile settings.
     set_property(TARGET shadowhook PROPERTY INTERFACE_COMPILE_OPTIONS "")
     set_property(TARGET shadowhook PROPERTY INTERFACE_COMPILE_FEATURES "")
+    set_property(TARGET shadowhook PROPERTY INTERFACE_LINK_OPTIONS "")
 
     target_compile_options(shadowhook PRIVATE
         -std=c99
