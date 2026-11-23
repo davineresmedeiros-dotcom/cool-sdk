@@ -1,6 +1,7 @@
 #include "modloader/mod.hpp"
 #include "modloader/modloader.hpp"
 #include "modloader/logger.hpp"
+#include "mod_registry_internal.hpp"
 
 #include <mutex>
 #include <unordered_map>
@@ -68,3 +69,12 @@ std::optional<ModMetadata> find_mod(std::string_view id) {
 }
 
 } // namespace modloader
+
+namespace modloader::detail {
+
+bool unregister_mod(std::string_view id) {
+    std::lock_guard<std::mutex> lock(registry_mutex);
+    return registry.erase(std::string(id)) != 0;
+}
+
+} // namespace modloader::detail
