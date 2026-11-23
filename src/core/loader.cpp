@@ -2,18 +2,24 @@
 #include "modloader/logger.hpp"
 
 #include <atomic>
+#include <mutex>
 
 namespace modloader {
+namespace {
+std::once_flag initialization_once;
+std::atomic<bool> initialized{false};
+}
 
 bool initialize() {
-    static std::atomic<bool> initialized{false};
-    bool expected = false;
+    std::call_once(initialization_once, [] {
+        log(LogLevel::info, "Cool Mod Loader core runtime initialized.");
+        initialized.store(true, std::memory_order_release);
+    });
+    return is_initialized();
+}
 
-    if (initialized.compare_exchange_strong(expected, true)) {
-        log(LogLevel::info, "Core runtime initialized.");
-    }
-
-    return true;
+bool is_initialized() noexcept {
+    return initialized.load(std::memory_order_acquire);
 }
 
 } // namespace modloader
