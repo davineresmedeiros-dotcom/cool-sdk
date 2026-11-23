@@ -37,6 +37,12 @@ if(ANDROID)
     # ShadowHook is a separate CMake target; root C standard settings do not
     # override its C dialect. Compile it as C99 and suppress NDK diagnostics
     # that are promoted to errors by this pinned dependency.
+    # ShadowHook v1.0.10 exports C-only flags (-std=c17, -Weverything)
+    # as PUBLIC; they incorrectly propagate into our C++ sources. Keep its
+    # include/link interface, but stop exporting C compile settings.
+    set_property(TARGET shadowhook PROPERTY INTERFACE_COMPILE_OPTIONS "")
+    set_property(TARGET shadowhook PROPERTY INTERFACE_COMPILE_FEATURES "")
+
     target_compile_options(shadowhook PRIVATE
         -std=c99
         -Wno-declaration-after-statement
