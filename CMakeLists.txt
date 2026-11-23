@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(modloader_core STATIC
     src/core/loader.cpp
+    src/core/logger.cpp
 )
 
 target_include_directories(modloader_core
