@@ -1,7 +1,8 @@
 #include "modloader/logger.hpp"
 
+#if !defined(__ANDROID__)
 #include <cstdio>
-#include <string_view>
+#endif
 
 #if defined(__ANDROID__)
 #include <android/log.h>
@@ -10,6 +11,7 @@
 namespace modloader {
 namespace {
 
+#if !defined(__ANDROID__)
 const char* level_name(LogLevel level) {
     switch (level) {
         case LogLevel::debug:   return "DEBUG";
@@ -19,8 +21,7 @@ const char* level_name(LogLevel level) {
     }
     return "UNKNOWN";
 }
-
-#if defined(__ANDROID__)
+#else
 android_LogPriority android_priority(LogLevel level) {
     switch (level) {
         case LogLevel::debug:   return ANDROID_LOG_DEBUG;
@@ -36,7 +37,8 @@ android_LogPriority android_priority(LogLevel level) {
 
 void log(LogLevel level, std::string_view message) {
 #if defined(__ANDROID__)
-    __android_log_write(android_priority(level), "CoolModLoader", message.data());
+    __android_log_print(android_priority(level), "CoolModLoader", "%.*s",
+        static_cast<int>(message.size()), message.data());
 #else
     std::fprintf(stderr, "[CoolModLoader][%s] %.*s\n",
         level_name(level),
