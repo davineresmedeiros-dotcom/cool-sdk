@@ -38,3 +38,18 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release
       - name: Build Android shared library
         run: cmake --build build-android --parallel
+
+      - name: Collect Android native libraries
+        run: |
+          mkdir -p android-native
+          find build-android -type f -name 'libcoolmodloader.so' -exec cp {} android-native/ \\
+          find build-android -type f -name 'libshadowhook.so' -exec cp {} android-native/ \\
+          test -s android-native/libcoolmodloader.so
+          test -s android-native/libshadowhook.so
+
+      - name: Upload Android arm64 libraries
+        uses: actions/upload-artifact@v4
+        with:
+          name: modloader-android-arm64
+          path: android-native/*.so
+          if-no-files-found: error
