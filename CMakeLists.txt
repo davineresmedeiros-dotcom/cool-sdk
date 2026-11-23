@@ -16,3 +16,17 @@ target_include_directories(modloader_core
 )
 
 target_compile_features(modloader_core PUBLIC cxx_std_20)
+set_target_properties(modloader_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if(ANDROID)
+    add_library(coolmodloader SHARED
+        src/platform/android/android_entry.cpp
+    )
+    target_link_libraries(coolmodloader PRIVATE modloader_core log)
+    set_target_properties(coolmodloader PROPERTIES OUTPUT_NAME "coolmodloader")
+else()
+    enable_testing()
+    add_executable(modloader_smoke tests/core/core_smoke.cpp)
+    target_link_libraries(modloader_smoke PRIVATE modloader_core)
+    add_test(NAME modloader_core_smoke COMMAND modloader_smoke)
+endif()
