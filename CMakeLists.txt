@@ -12,6 +12,7 @@ add_library(modloader_core STATIC
     src/core/logger.cpp
     src/core/mod_registry.cpp
     src/core/mod_runtime.cpp
+    src/core/event.cpp
 )
 
 target_include_directories(modloader_core
