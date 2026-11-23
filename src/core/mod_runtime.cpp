@@ -1,4 +1,5 @@
 #include "modloader/mod_runtime.hpp"
+#include "modloader/event.hpp"
 #include "modloader/mod_api.hpp"
 #include "modloader/modloader.hpp"
 #include "modloader/logger.hpp"
@@ -132,6 +133,9 @@ bool unload_mod(const std::string& id) {
         module = std::move(it->second);
         modules.erase(it);
     }
+
+    // Remove the mod's event callbacks before its code is unloaded.
+    unsubscribe_events_by_owner(id);
 
     try {
         if (module->unload) {
