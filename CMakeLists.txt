@@ -41,6 +41,9 @@ if(ANDROID)
         -std=c99
         -Wno-declaration-after-statement
         -Wno-unsafe-buffer-usage
+        -Wno-switch-default
+        -Wno-c11-extensions
+        -Wno-reserved-identifier
     )
 
     add_library(coolmodloader SHARED
