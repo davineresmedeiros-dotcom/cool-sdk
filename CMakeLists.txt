@@ -21,8 +21,9 @@ set_target_properties(modloader_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 if(ANDROID)
     add_library(coolmodloader SHARED
         src/platform/android/android_entry.cpp
+        src/platform/android/game_attach.cpp
     )
-    target_link_libraries(coolmodloader PRIVATE modloader_core log)
+    target_link_libraries(coolmodloader PRIVATE modloader_core log dl)
     set_target_properties(coolmodloader PROPERTIES OUTPUT_NAME "coolmodloader")
 else()
     enable_testing()
