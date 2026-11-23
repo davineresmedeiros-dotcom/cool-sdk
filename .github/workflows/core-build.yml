@@ -42,8 +42,8 @@ jobs:
       - name: Collect Android native libraries
         run: |
           mkdir -p android-native
-          find build-android -type f -name 'libcoolmodloader.so' -exec cp {} android-native/ \\
-          find build-android -type f -name 'libshadowhook.so' -exec cp {} android-native/ \\
+          find build-android -type f -name 'libcoolmodloader.so' -exec cp {} android-native/ \;
+          find build-android -type f -name 'libshadowhook.so' -exec cp {} android-native/ \;
           test -s android-native/libcoolmodloader.so
           test -s android-native/libshadowhook.so
 
