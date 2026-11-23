@@ -4,7 +4,10 @@
 
 namespace modloader {
 
-// Public entry point will be expanded as the runtime lifecycle is implemented.
+// Initializes the core runtime. Safe to call more than once.
 bool initialize();
+
+// Reports whether initialize() has completed successfully.
+bool is_initialized() noexcept;
 
 } // namespace modloader
