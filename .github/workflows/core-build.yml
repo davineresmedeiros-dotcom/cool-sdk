@@ -27,7 +27,7 @@ jobs:
       - name: Install NDK
         run: sdkmanager "ndk;27.2.12479018"
       - name: Install compatible CMake
-        run: python -m pip install cmake==3.31.6
+        run: python -m pip install cmake==4.0.2
       - name: Configure Android arm64
         run: |
           cmake -S . -B build-android \
