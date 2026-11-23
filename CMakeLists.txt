@@ -34,6 +34,15 @@ if(ANDROID)
     )
     FetchContent_MakeAvailable(shadowhook_src)
 
+    # ShadowHook is a separate CMake target; root C standard settings do not
+    # override its C dialect. Compile it as C99 and suppress NDK diagnostics
+    # that are promoted to errors by this pinned dependency.
+    target_compile_options(shadowhook PRIVATE
+        -std=c99
+        -Wno-declaration-after-statement
+        -Wno-unsafe-buffer-usage
+    )
+
     add_library(coolmodloader SHARED
         src/platform/android/android_entry.cpp
         src/platform/android/game_attach.cpp
