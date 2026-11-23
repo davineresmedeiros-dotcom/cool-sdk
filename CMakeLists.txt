@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(CoolModLoader VERSION 0.1.0 LANGUAGES C CXX)
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -19,6 +21,10 @@ target_compile_features(modloader_core PUBLIC cxx_std_20)
 set_target_properties(modloader_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(ANDROID)
+    # NDK Clang enables this newer diagnostic; ShadowHook v1.0.10 treats
+    # warnings as errors, so disable it only for the C dependency build.
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unsafe-buffer-usage")
+
     include(FetchContent)
     FetchContent_Declare(shadowhook_src
         GIT_REPOSITORY https://github.com/bytedance/android-inline-hook.git
