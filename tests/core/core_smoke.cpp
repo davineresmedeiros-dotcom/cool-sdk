@@ -1,7 +1,22 @@
 #include "modloader/modloader.hpp"
+#include "modloader/event.hpp"
 #include "modloader/hook.hpp"
 #include "modloader/mod.hpp"
 #include "modloader/mod_runtime.hpp"
+
+namespace {
+int event_calls = 0;
+int received_value = 0;
+void* received_user_data = nullptr;
+
+void on_test_event(const modloader::Event& event) {
+    ++event_calls;
+    received_user_data = event.user_data;
+    if (event.data && event.data_size == sizeof(int)) {
+        received_value = *static_cast<const int*>(event.data);
+    }
+}
+} // namespace
 
 int main() {
     if (modloader::is_initialized()) {
@@ -12,6 +27,34 @@ int main() {
     }
     if (!modloader::initialize()) {
         return 3;
+    }
+
+    // Event dispatch, individual unsubscribe, and owner cleanup.
+    int subscriber_data = 42;
+    const auto event_a = modloader::subscribe_event(
+        "test.ready", "sample.mod", on_test_event, &subscriber_data);
+    const auto event_b = modloader::subscribe_event(
+        "test.ready", "sample.other", on_test_event);
+    if (event_a == 0 || event_b == 0 || event_a == event_b) {
+        return 22;
+    }
+    const int event_value = 1234;
+    if (modloader::emit_event("test.ready", &event_value, sizeof(event_value)) != 2
+        || event_calls != 2 || received_value != event_value) {
+        return 23;
+    }
+    if (!modloader::unsubscribe_event(event_a)
+        || modloader::unsubscribe_event(event_a)) {
+        return 24;
+    }
+    if (modloader::unsubscribe_events_by_owner("sample.other") != 1
+        || modloader::emit_event("test.ready") != 0) {
+        return 25;
+    }
+    if (modloader::subscribe_event("", "sample.mod", on_test_event) != 0
+        || modloader::subscribe_event("test.ready", "", on_test_event) != 0
+        || modloader::subscribe_event("test.ready", "sample.mod", nullptr) != 0) {
+        return 26;
     }
 
     const modloader::ModMetadata sample{"sample.mod", "Sample Mod", "1.0.0"};
