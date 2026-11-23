@@ -1,15 +1,18 @@
 #include "modloader/modloader.hpp"
 #include "modloader/logger.hpp"
 
-#include <string>
+#include <atomic>
 
 namespace modloader {
 
 bool initialize() {
-    log(LogLevel::info, "Core initialization started.");
-    log(LogLevel::info, std::string("Version: ") + version);
-    log(LogLevel::info, std::string("Target Geometry Dash: ") + target_game_version);
-    log(LogLevel::info, "Core initialization completed.");
+    static std::atomic<bool> initialized{false};
+    bool expected = false;
+
+    if (initialized.compare_exchange_strong(expected, true)) {
+        log(LogLevel::info, "Core runtime initialized.");
+    }
+
     return true;
 }
 
