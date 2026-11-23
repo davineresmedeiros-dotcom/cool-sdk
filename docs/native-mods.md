@@ -54,3 +54,26 @@ modloader::unload_mod("example.mod");
 `load_mod_library` loads the specified file with local symbol visibility and immediate symbol resolution. The loader rejects missing exports, unsupported ABI versions, invalid metadata, duplicate IDs, and failed `onLoad` callbacks. Unload calls `onUnload` before closing the library and removing its registered metadata.
 
 Native mods are executable code. Only load mods you trust, and build them for the same CPU ABI and compatible native runtime as the loader. Mod dependencies, automatic directory discovery, and GD-specific bindings are not implemented yet.
+
+
+## Event API
+
+Mods can subscribe to named events using `modloader/event.hpp`. Each subscription has an owner ID so its callbacks can be removed when the mod unloads. Event dispatch is synchronous and invokes a snapshot of matching callbacks outside the registry lock, allowing callbacks to subscribe or unsubscribe safely.
+
+```cpp
+#include "modloader/event.hpp"
+
+void on_game_ready(const modloader::Event& event) {
+    // event.data is borrowed until emit_event() returns.
+}
+
+void register_events() {
+    modloader::subscribe_event("game.ready", "example.mod", on_game_ready);
+}
+
+void cleanup_events() {
+    modloader::unsubscribe_events_by_owner("example.mod");
+}
+```
+
+Use `emit_event(name, data, size)` to dispatch an event. The payload is borrowed and must remain valid for the duration of the call. The event system does not yet automatically infer a mod's owner; mods should pass their own ID and remove their subscriptions during unload.
