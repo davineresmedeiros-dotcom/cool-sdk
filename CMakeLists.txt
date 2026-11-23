@@ -11,6 +11,7 @@ add_library(modloader_core STATIC
     src/core/loader.cpp
     src/core/logger.cpp
     src/core/mod_registry.cpp
+    src/core/mod_runtime.cpp
 )
 
 target_include_directories(modloader_core
@@ -19,6 +20,7 @@ target_include_directories(modloader_core
 )
 
 target_compile_features(modloader_core PUBLIC cxx_std_20)
+target_link_libraries(modloader_core PUBLIC ${CMAKE_DL_LIBS})
 set_target_properties(modloader_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 if(ANDROID)
@@ -64,7 +66,13 @@ if(ANDROID)
 else()
     target_sources(modloader_core PRIVATE src/platform/host/hook_backend.cpp)
     enable_testing()
+    add_library(sample_mod SHARED tests/mods/sample_mod.cpp)
+    target_include_directories(sample_mod PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    set_target_properties(sample_mod PROPERTIES PREFIX "" OUTPUT_NAME "sample_mod")
+
     add_executable(modloader_smoke tests/core/core_smoke.cpp)
     target_link_libraries(modloader_smoke PRIVATE modloader_core)
+    target_compile_definitions(modloader_smoke PRIVATE SAMPLE_MOD_PATH="$<TARGET_FILE:sample_mod>")
+    add_dependencies(modloader_smoke sample_mod)
     add_test(NAME modloader_core_smoke COMMAND modloader_smoke)
 endif()
